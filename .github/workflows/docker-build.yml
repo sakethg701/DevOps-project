@@ -16,7 +16,8 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-
+      - name: Set SHA
+        run: echo "SHA_SHORT=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
       - name: Login to GHCR
         uses: docker/login-action@v3
         with:
@@ -26,8 +27,21 @@ jobs:
 
       - name: Build Image
         run: |
-          docker build -t ghcr.io/sakethg701/devops-capstone:latest ./app
+          docker build -t ghcr.io/sakethg701/devops-capstone:${SHA_SHORT} ./app
 
       - name: Push Image
         run: |
-          docker push ghcr.io/sakethg701/devops-capstone:latest
+          docker push ghcr.io/sakethg701/devops-capstone:${SHA_SHORT}
+
+      - name: Update Helm values.yaml
+        run: |
+          sed -i "s/tag: .*/tag: ${SHA_SHORT}/" nginx-app/values.yaml
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add nginx-app/values.yaml
+          git commit -m "Update image tag to ${SHA_SHORT} [skip ci]" || echo "No changes to commit"
+      - name: Push changes
+        run: |
+          git push
