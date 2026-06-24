@@ -5,8 +5,13 @@
 </head>
 <body>
 <h1>DevOps GitOps Project v9</h1>
-<p>Deployed using Helm + ArgoCD + GHCR </p>
+<p>Deployed using Helm + ArgoCD + GHCR + ingress</p>
 <p>The most stable version with no downtime</p>
-<p>Today is 24-06-2026</p>
+<p>Today's date is: <span id="current-date"></span></p>
+<script>
+    const today=new Date();
+    const fomarttedDate=today.toLocaleDateString();
+    document.getElementById('current-date').textContent=fomarttedDate;
+</script>
 </body>
 </html>
